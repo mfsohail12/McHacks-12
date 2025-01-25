@@ -1,15 +1,14 @@
 import pygame as pg
 from pygame.locals import KEYDOWN, QUIT
+import time
 
 # TODO: Put this on client side
 class Patient(pg.sprite.Sprite):
-    def __init__(self, color, width, height, xlim, ylim):
-        super().__init__()
-
-        self.image = pg.Surface([width, height])
-        self.image.fill(color)
-
-        self.rect = self.image.get_rect()  # get rectangle corresponding to image, position can be updated via rect.x and rect.y
+    def __init__(self, name, sprite_path, pos, xlim, ylim, width, height):
+        super().__init__() 
+        self.name = name
+        self.rect = pg.Rect(pos[0], pos[1], width, height)
+        self.image = pg.image.load(sprite_path).convert_alpha()
         self.xlim = xlim
         self.ylim = ylim
 
@@ -25,27 +24,51 @@ class Patient(pg.sprite.Sprite):
         if keys[pg.K_DOWN]:
             self.rect.y = min(self.rect.y + 10, self.ylim[1])
 
+class Staff(pg.sprite.Sprite):
+    def __init__(self, name, sprite_path, pos, width, height):
+        super().__init__()
+        self.name = name
+        self.rect = pg.Rect(pos[0], pos[1], width, height)
+        self.image = pg.image.load(sprite_path).convert_alpha()
+
 class Game:
     def __init__(self, display_width, display_height):
         self.dw = display_width
         self.dh = display_height
         self.patients = pg.sprite.Group()
+        self.staff = pg.sprite.Group()
 
-    def add_patient(self, color, width, height, xlim, ylim, position):
-        p = Patient(color, width, height, xlim, ylim)
-        p.rect.x = position[0]
-        p.rect.y = position[1]
+    def initialize(self):
+        pg.init()
+        self.screen = pg.display.set_mode((self.dw, self.dh))
+
+    def load_static_images(self):
+        self.bkg_img = pg.image.load('graphics/grass.png').convert_alpha()
+
+    def add_patient(self, name, sprite_path, pos, xlim, ylim, width, height):
+        p = Patient(name, sprite_path, pos, xlim, ylim, width, height)
+        p.rect.x = pos[0]
+        p.rect.y = pos[1]
         self.patients.add(p)
+
+    def add_staff(self, name, sprite_path, pos, width, height):
+        s = Staff(name, sprite_path, pos, width, height)
+        s.rect.x = pos[0]
+        s.rect.y = pos[1]
+        self.staff.add(s)
     
-    def remove_patient(self, p):
-        p.kill()
+    def remove(self, name):
+        for sprite in self.staff:
+            if sprite.name == name:
+                sprite.kill()
+        for sprite in self.patients:
+            if sprite.name == name:
+                sprite.kill()
     
     def run(self):
         '''
         Implements the main game loop.
         '''
-        pg.init()
-        screen = pg.display.set_mode((self.dw, self.dh))
         running = True
         clock = pg.time.Clock()
 
@@ -55,20 +78,28 @@ class Game:
             if event.type == QUIT:
                 running = False
             
+            self.screen.blit(self.bkg_img, (0,0))
             self.patients.update()  # update state of each patient
-            screen.fill((0, 128, 0))
-            self.patients.draw(screen)  # draw patients to surface (arbitrary order)
+            self.patients.draw(self.screen)  # draw patients to surface (arbitrary order)
+            self.staff.draw(self.screen)
+
             pg.display.flip()  # update screen content
             clock.tick(60)
 
 
-DISPLAY_WIDTH = 800
-DISPLAY_HEIGHT = 800
+DISPLAY_WIDTH = 640
+DISPLAY_HEIGHT = 640
 SPRITE_WIDTH = 30
 SPRITE_HEIGHT = 30
 XLIM = [0, DISPLAY_WIDTH-SPRITE_WIDTH]
 YLIM = [0, DISPLAY_HEIGHT-SPRITE_HEIGHT]
 
 game = Game(DISPLAY_WIDTH, DISPLAY_HEIGHT)
-game.add_patient((255,255,0), 30, 30, XLIM, YLIM, [0, 0])
+game.initialize()
+game.load_static_images()
+
+patient_path = '/Users/Ritchie/Desktop/U4 Winter/mchacks/McHacks-12/server/graphics/female_patient_generated_edited.png'
+staff_path = '/Users/Ritchie/Desktop/U4 Winter/mchacks/McHacks-12/server/graphics/female_patient_generated_edited.png'
+game.add_patient('John', patient_path, [0,0], XLIM, YLIM, 30, 30)
+game.add_staff('Mary', staff_path, [450,50], 30, 30)
 game.run()
