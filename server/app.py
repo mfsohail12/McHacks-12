@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 @app.route('/login', methods=['GET'])
 def login():
-	return render_template("login.html")'''
+	return render_template("login.html")
 
 @app.route('/<user>')
 def user(user):
