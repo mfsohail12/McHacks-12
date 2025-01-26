@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import logo from "../assets/logo.webp";
 import { HiQuestionMarkCircle } from "react-icons/hi";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const [data, setData] = useState(null);
@@ -45,21 +46,34 @@ const HomePage = () => {
             </div>
           </div>
           <div className="mt-6">
-            <h3 className="text-3xl font-bold text-gray-800">CURRENT PHASE</h3>
-            <p className="text-2xl uppercase text-gray-500 mt-1 mb-7 font-bold">
+            <div className="flex items-center">
+              <h3 className="text-3xl font-bold text-gray-800">
+                CURRENT PHASE
+              </h3>
+              <Link to="http://localhost:8000/phases">
+                <HiQuestionMarkCircle className="text-2xl ml-2" />
+              </Link>
+            </div>
+            <p className="text-2xl uppercase text-green-300 mt-1 mb-7 font-bold">
               {data ? data.status.current_phase : "loading ..."}
             </p>
             <div className="flex items-center">
               <h3 className="text-3xl font-bold text-gray-800">TRIAGE LEVEL</h3>
-              <HiQuestionMarkCircle className="text-2xl ml-2" />
+              <Link to="http://localhost:8000/triage">
+                <HiQuestionMarkCircle className="text-2xl ml-2" />
+              </Link>
             </div>
-            <p className="text-2xl uppercase text-gray-500 mt-1 mb-3 font-bold">
+            <p className="text-2xl uppercase text-green-300 mt-1 mb-10 font-bold">
               {data ? data.triage_category : "loading ..."}
             </p>
           </div>
           <div className="mt-4 flex justify-between">
-            <span className="text-gray-600">TRACKER</span>
-            <span className="text-gray-600">GAME LOBBY</span>
+            <span className="text-gray-600 font-bold text-green-600">
+              TRACKER
+            </span>
+            <span className="text-gray-600 font-bold text-green-600">
+              GAME LOBBY
+            </span>
           </div>
         </div>
       </div>
