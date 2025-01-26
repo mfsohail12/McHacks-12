@@ -5,6 +5,7 @@ import pickle
 import random
 import socket
 from constants import *
+import json
 
 # server = "10.122.247.13"
 server = "localhost"
@@ -31,7 +32,6 @@ def threaded_client(conn, data):
     while True:
         try:
             # # Receive data from the client and update player
-            # data = pickle.loads(conn.recv(2048))
             PATIENT_DATA[patient] = data
 
             if not data:
@@ -40,14 +40,12 @@ def threaded_client(conn, data):
 
             # Send the updated data of all players to the current player
             reply = {k:v for k,v in PATIENT_DATA.items() if not(k == patient)}
-
-            # print(f"Received from player {patient}: {data}")
-            # print(f"Sending to player {patient}: {reply}")
-
-            # Send the reply back to the client
-            import sys
-            print(sys.getsizeof(reply))
-            conn.sendall(pickle.dumps(reply))
+            reply_data = json.dumps(reply).encode('utf-8')
+            if len(reply) > 0:
+                conn.sendall(reply_data)
+            else:
+                conn.sendall(json.dumps({"EMPTY": 1}).encode('utf-8'))
+            # conn.sendall(pickle.dumps(reply))
 
         except Exception as e:
             print(f"Error in thread for player {patient}: {e}")
@@ -62,14 +60,14 @@ current_patient = 0
 try:
     while True:
         client_socket, client_address = server_socket.accept()
-        # print("Connected to: ", client_address)
-
-        data = pickle.loads(client_socket.recv(1024))
-
-        # print("Received from client: ", data)
+        
+        data = client_socket.recv(4096).decode('utf-8')
+        print("Received from client: ", data)
+        data = json.loads(data)
 
         if current_patient < MAX_PATIENTS:
             start_new_thread(threaded_client, (client_socket, data))
+            current_patient += 1
 
         # # Only allow up to max_players to connect
         # if currentPlayer < MAX_PATIENTS:

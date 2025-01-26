@@ -5,6 +5,7 @@ from player import Patient, Staff
 from constants import *
 from Network import Network
 import pickle
+import json
 
 class Game:
     def __init__(self, display_width, display_height):
@@ -20,6 +21,7 @@ class Game:
 
     def load_static_images(self):
         self.bkg_img = pg.image.load('graphics/grass.png').convert_alpha()
+        self.house1 = pg.image.load('graphics/House1.png').convert_alpha()
 
     def get_patient_data(self, name):
         '''
@@ -29,13 +31,13 @@ class Game:
             if p.name == name:
                 return p.get_data()
 
-    def add_patient(self, name, sprite_path, n_frames, frame_rate, width, height, scale, pos, xlim, ylim, main_char=False):
+    def add_patient(self, name, sprite_path, n_frames, frame_rate, width, height, scale, pos_x, pos_y, xlim, ylim, main_char=False):
         '''
         Add patient sprite to game.
         '''
-        p = Patient(name, width, height, scale, pos, xlim, ylim)
-        p.rect.x = pos[0]
-        p.rect.y = pos[1]
+        p = Patient(name, width, height, scale, pos_x, pos_y, xlim, ylim)
+        p.rect.x = pos_x
+        p.rect.y = pos_y
         p.init_sprite(sprite_path, n_frames, frame_rate)
         self.patients.add(p)
         self.patient_names.add(name)
@@ -79,22 +81,25 @@ class Game:
             if event.type == QUIT:
                 running = False
             
+            # main_char_data = json.dumps(self.main_char.get_data()).encode('utf-8')
+            # print("Sending: ", main_char_data)
             other_patient_data = network.send(self.main_char.get_data())
-
-            for k, v in other_patient_data.items():
-                if not(k in self.patient_names):
-                    self.add_patient(**v)
-                else:
-                    for p in self.patients:
-                        if p.name != self.main_char.name:
-                            p.rect.x = v['pos'][0]
-                            p.rect.y = v['pos'][1]
+            if not(other_patient_data is None) and not("EMPTY" in other_patient_data.keys()):
+                for k, v in other_patient_data.items(): 
+                    if not(k in self.patient_names):  # bring into patient group on first pass
+                        self.add_patient(**v)
+                    else:
+                        for p in self.patients:
+                            if p.name != self.main_char.name:
+                                p.rect.x = v['pos_x']
+                                p.rect.y = v['pos_y']
 
             # all_patients = [self.main_char] + [patient for patient in other_patients]
             # all_patients = [patient] + [Patient(data.name, data.width, data.height, data.pos, data.xlim, data.ylim) for data in other_patient_data]
             # self.patients.add(all_patients)
 
             self.screen.blit(self.bkg_img, (0,0))
+            self.screen.blit(self.house1, (250,200))
             self.patients.update()  # update state of each patient
 
             # self.staff.update(self.patients)
@@ -125,12 +130,12 @@ if __name__ == '__main__':
     # -----------------------------------
     p0_spritesheet = SPRITE_SHEETS[args.color]
     n_frames = 4
-    game.add_patient(args.name, p0_spritesheet, n_frames, SPRITE_RATE, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SCALE, [0,0], XLIM, YLIM, main_char=True)
+    game.add_patient(args.name, p0_spritesheet, n_frames, SPRITE_RATE, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SCALE, 0, 0, XLIM, YLIM, main_char=True)
 
     # p_data = game.get_
 
-    # staff_path = '/Users/Ritchie/Desktop/U4 Winter/mchacks/McHacks-12/server/graphics/female_patient_generated_edited.png'
-    # dialogue_path = '/Users/Ritchie/Desktop/U4 Winter/mchacks/McHacks-12/server/dialogue/mary.txt'
-    # game.add_staff('Mary', staff_path, dialogue_path, STAFF_WIDTH, STAFF_HEIGHT, [450,50])
+    staff_path = '/Users/Ritchie/Desktop/U4 Winter/mchacks/McHacks-12/server/graphics/female_patient_generated_edited.png'
+    dialogue_path = '/Users/Ritchie/Desktop/U4 Winter/mchacks/McHacks-12/server/dialogue/mary.txt'
+    game.add_staff('Mary', staff_path, dialogue_path, STAFF_WIDTH, STAFF_HEIGHT, [450,50])
 
     game.run()

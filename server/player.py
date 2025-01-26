@@ -19,13 +19,13 @@ class SpriteSheet:
 
 # TODO: Put this on client side
 class Patient(pg.sprite.Sprite):
-    def __init__(self, name, width, height, scale, pos, xlim, ylim):
+    def __init__(self, name, width, height, scale, pos_x, pos_y, xlim, ylim):
         super().__init__() 
         self.name        = name
         self.width       = width
         self.height      = height
         self.scale       = scale
-        self.rect        = pg.Rect(pos[0], pos[1], width, height)
+        self.rect        = pg.Rect(pos_x, pos_y, width, height)
         self.xlim        = xlim
         self.ylim        = ylim
         self.frame_count = 0
@@ -42,7 +42,9 @@ class Patient(pg.sprite.Sprite):
                 'width':       self.width,
                 'height':      self.height,
                 'scale':       self.scale,
-                'pos':         [self.rect.x, self.rect.y],
+                'pos_x':       self.rect.x,
+                'pos_y':       self.rect.y,
+                # 'pos':         [self.rect.x, self.rect.y],
                 'xlim':        self.xlim,
                 'ylim':        self.ylim,
                 'sprite_path': self.sprite_path,

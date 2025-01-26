@@ -1,6 +1,6 @@
 import socket
 import pickle
-
+import json
 
 class Network:
     def __init__(self):
@@ -26,10 +26,11 @@ class Network:
     
     def send(self, data):
         try:
-            import sys
-            print(sys.getsizeof(data))
-            self.client.sendall(pickle.dumps(data))
-            return pickle.loads(self.client.recv(20000))
+            json_data = json.dumps(data).encode('utf-8')
+            self.client.send(json_data)
+
+            # print(self.client.recv(4096))
+            # return json.loads(self.client.recv(4096).decode('utf-8'))
         except socket.error as e:
             print(e)
 
