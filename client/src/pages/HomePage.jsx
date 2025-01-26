@@ -5,15 +5,32 @@ import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const [data, setData] = useState(null);
-  const userId = "anon_1234";
+  const [randomUser, setRandomUser] = useState(null);
+  const userId = "anon_3396";
 
   useEffect(() => {
+    // const fetchUser = async () => {
+    //   try {
+    //     const response = await fetch(
+    //       "https://ifem-award-mchacks-2025.onrender.com/api/v1/queue"
+    //     );
+    //     if (!response) throw new Error("null response");
+    //     if (response.error) throw new Error(response.error);
+    //     const result = await response.json();
+    //     setRandomUser(result);
+    //   } catch (err) {
+    //     throw new Error("failed retrieving data");
+    //   }
+    // };
+
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "http://127.0.0.1:5000/api/v1/patient/" + { userId }
+          "https://ifem-award-mchacks-2025.onrender.com/api/v1/patient/" +
+            { userId }
         );
         if (!response) throw new Error("null response");
+        if (response.error) throw new Error(response.error);
         const result = await response.json();
         setData(result);
       } catch (err) {
@@ -22,11 +39,10 @@ const HomePage = () => {
     };
 
     fetchData();
+    // fetchUser();
     const interval = setInterval(fetchData, 2000);
     return () => clearInterval(interval);
   }, []);
-
-  console.log(data);
 
   return (
     <div>
@@ -40,9 +56,7 @@ const HomePage = () => {
               <h2 className="text-1xl font-bold text-gray-80">
                 YOUR POSITION IN LINE IS
               </h2>
-              <h2 className="text-5xl font-bold text-green-300">
-                {data ? data.queue_position.global : "loading ..."}
-              </h2>
+              <h2 className="text-5xl font-bold text-green-300">28</h2>
             </div>
           </div>
           <div className="mt-6">
@@ -55,7 +69,7 @@ const HomePage = () => {
               </Link>
             </div>
             <p className="text-2xl uppercase text-green-300 mt-1 mb-7 font-bold">
-              {data ? data.status.current_phase : "loading ..."}
+              REGISTERED
             </p>
             <div className="flex items-center">
               <h3 className="text-3xl font-bold text-gray-800">TRIAGE LEVEL</h3>
@@ -64,16 +78,22 @@ const HomePage = () => {
               </Link>
             </div>
             <p className="text-2xl uppercase text-green-300 mt-1 mb-10 font-bold">
-              {data ? data.triage_category : "loading ..."}
+              3
             </p>
           </div>
           <div className="mt-4 flex justify-between">
-            <span className="text-gray-600 font-bold text-green-600">
+            <Link
+              to="/tracker"
+              className="text-gray-600 font-bold text-green-600"
+            >
               TRACKER
-            </span>
-            <span className="text-gray-600 font-bold text-green-600">
+            </Link>
+            <Link
+              to="/gamelobby"
+              className="text-gray-600 font-bold text-green-600"
+            >
               GAME LOBBY
-            </span>
+            </Link>
           </div>
         </div>
       </div>
