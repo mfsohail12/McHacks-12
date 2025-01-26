@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{{ title }}</title>
+    </head>
+
+    <body>
+        <h1>{{ 'Your Journey through the ER (Phases)' }}</h1>
+        <ul>
+            <li>
+                <b>Registered:</b> The patient or their family provide basic information and a medical record (electronic or on paper) is generated.
+            </li>
+            <li>
+                <b>Triaged:</b> A nurse evaluates the patient's condition and assigns a triage level (1-5). This determines how urgently they need care relative to other patients.
+            </li>
+                <ul>
+                    <li>
+                        Please note that the length of waiting will vary dependent on your triage level.
+                    </li>
+                </ul>
+            <li>
+                <b>Investigation Pending:</b> Doctors assess the patient and may order tests (blood work, imaging, etc.). If ordered, tests are performed and there is more waiting for test results to come back.
+            </li>
+            <li>
+                <b>Treated:</b> Once tests results are available the doctor reviews them and generates a treatment plan, and the patient is treated
+            </li>
+            <li>
+                <b>Admitted:</b> If the patients require monitoring and further care, they may be admitted to the hospital
+            </li>
+            <li>
+                <b>Discharged:</b> Once the patient is treated, they are discharged from the hospital.
+            </li>
+        </ul>
+    </body>
+    <body>
+        <h1>{{ 'Triage Explanation' }}</h1>
+        <ul>
+            <li>
+                <b>Level I:</b> Blue, severely ill and requires resuscitation.
+            </li>
+            <li>
+                <b>Level II:</b> Red, requires emergent care and rapid medical intervention.
+            </li>
+            <li>
+                <b>Level III:</b> Yellow, requires urgent care.
+            </li>
+            <li>
+                <b>Level IV:</b> Green, requires less-urgent care.
+            </li>
+            <li>
+                <b>Level V:</b> White, requires non-urgent care.
+            </li>
+        </ul>
+    </body>
+</html>

@@ -9,7 +9,7 @@ CORS(app)
 
 num_of_patients = 10
 
-@app.route('/dataset') # extra path for encryption
+@app.route('/ifem/dataset') # extra path for encryption
 def dataset():
 	sort = request.args.get('sort', 'arrival_time')
 	patients = [generate_mock_patient(num_of_patients) for _ in range(num_of_patients)]
@@ -18,7 +18,11 @@ def dataset():
 	return jsonify({
 		'Waiting Patients' : len(patients),
 		'patients': [p.serialize() for p in patients]
-	}) 
+	})
+
+@app.route('/explain')
+def explain():
+	return render_template('explanation.html', title='Home')
 
 
 if __name__ == '__main__':
