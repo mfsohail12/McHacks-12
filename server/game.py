@@ -2,11 +2,15 @@ import pygame as pg
 from pygame.locals import KEYDOWN, QUIT
 import time
 from player import Patient, Staff
+from constants import *
+from Network import Network
+import pickle
 
 class Game:
     def __init__(self, display_width, display_height):
         self.dw = display_width
         self.dh = display_height
+        self.patient_names = set()
         self.patients = pg.sprite.Group()
         self.staff = pg.sprite.Group()
 
@@ -17,15 +21,27 @@ class Game:
     def load_static_images(self):
         self.bkg_img = pg.image.load('graphics/grass.png').convert_alpha()
 
-    def add_patient(self, name, sprite_path, n_frames, frame_rate, width, height, scale, pos, xlim, ylim):
+    def get_patient_data(self, name):
+        '''
+        Retrieve data corresponding to a patient.
+        '''
+        for p in self.patients:
+            if p.name == name:
+                return p.get_data()
+
+    def add_patient(self, name, sprite_path, n_frames, frame_rate, width, height, scale, pos, xlim, ylim, main_char=False):
         '''
         Add patient sprite to game.
         '''
-        p = Patient(name, width, height, pos, xlim, ylim)
+        p = Patient(name, width, height, scale, pos, xlim, ylim)
         p.rect.x = pos[0]
         p.rect.y = pos[1]
-        p.init_sprite(sprite_path, n_frames, frame_rate, width, height, scale)
+        p.init_sprite(sprite_path, n_frames, frame_rate)
         self.patients.add(p)
+        self.patient_names.add(name)
+
+        if main_char:
+            self.main_char = p
 
     def add_staff(self, name, sprite_path, dialogue_path, width, height, pos):
         '''
@@ -54,15 +70,34 @@ class Game:
         running = True
         clock = pg.time.Clock()
 
+        network = Network()
+        # patient = network.getP()
+
         while running:
 
             event = pg.event.poll()
             if event.type == QUIT:
                 running = False
             
+            other_patient_data = network.send(self.main_char.get_data())
+
+            for k, v in other_patient_data.items():
+                if not(k in self.patient_names):
+                    self.add_patient(**v)
+                else:
+                    for p in self.patients:
+                        if p.name != self.main_char.name:
+                            p.rect.x = v['pos'][0]
+                            p.rect.y = v['pos'][1]
+
+            # all_patients = [self.main_char] + [patient for patient in other_patients]
+            # all_patients = [patient] + [Patient(data.name, data.width, data.height, data.pos, data.xlim, data.ylim) for data in other_patient_data]
+            # self.patients.add(all_patients)
+
             self.screen.blit(self.bkg_img, (0,0))
             self.patients.update()  # update state of each patient
-            self.staff.update(self.patients)
+
+            # self.staff.update(self.patients)
             self.patients.draw(self.screen)  # draw patients to surface (arbitrary order)
             self.staff.draw(self.screen)
 
@@ -71,29 +106,31 @@ class Game:
 
 
 if __name__ == '__main__':
-    DISPLAY_WIDTH  = 640
-    DISPLAY_HEIGHT = 640
 
-    PLAYER_WIDTH   = 16
-    PLAYER_HEIGHT  = 16
-    PLAYER_SCALE   = 4
-    STAFF_WIDTH    = 40
-    STAFF_HEIGHT   = 40
-    SPRITE_RATE    = 20
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--name',  required=True, type=str, help='Name of character to add.')
+    parser.add_argument('--color', required=True, type=str, help='Colour of character sprite.')
+    args = parser.parse_args()
 
-    XLIM = [0, DISPLAY_WIDTH-PLAYER_WIDTH]
-    YLIM = [0, DISPLAY_HEIGHT-PLAYER_HEIGHT]
-
+    # ---------------
+    # Initialize game
+    # ---------------
     game = Game(DISPLAY_WIDTH, DISPLAY_HEIGHT)
     game.initialize()
     game.load_static_images()
 
-    p0_spritesheet = '/Users/Ritchie/Desktop/U4 Winter/mchacks/McHacks-12/server/graphics/16PixelSlime/BlueSlime/BlueSlimeWalking-Sheet.png'
+    # -----------------------------------
+    # Initialize patient's main character
+    # -----------------------------------
+    p0_spritesheet = SPRITE_SHEETS[args.color]
     n_frames = 4
-    game.add_patient('John', p0_spritesheet, n_frames, SPRITE_RATE, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SCALE, [0,0], XLIM, YLIM)
+    game.add_patient(args.name, p0_spritesheet, n_frames, SPRITE_RATE, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SCALE, [0,0], XLIM, YLIM, main_char=True)
 
-    staff_path = '/Users/Ritchie/Desktop/U4 Winter/mchacks/McHacks-12/server/graphics/female_patient_generated_edited.png'
-    dialogue_path = '/Users/Ritchie/Desktop/U4 Winter/mchacks/McHacks-12/server/dialogue/mary.txt'
-    game.add_staff('Mary', staff_path, dialogue_path, STAFF_WIDTH, STAFF_HEIGHT, [450,50])
+    # p_data = game.get_
+
+    # staff_path = '/Users/Ritchie/Desktop/U4 Winter/mchacks/McHacks-12/server/graphics/female_patient_generated_edited.png'
+    # dialogue_path = '/Users/Ritchie/Desktop/U4 Winter/mchacks/McHacks-12/server/dialogue/mary.txt'
+    # game.add_staff('Mary', staff_path, dialogue_path, STAFF_WIDTH, STAFF_HEIGHT, [450,50])
 
     game.run()
