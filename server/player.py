@@ -19,18 +19,35 @@ class SpriteSheet:
 
 # TODO: Put this on client side
 class Patient(pg.sprite.Sprite):
-    def __init__(self, name, width, height, pos, xlim, ylim):
+    def __init__(self, name, width, height, scale, pos, xlim, ylim):
         super().__init__() 
-        self.name = name
-        self.rect = pg.Rect(pos[0], pos[1], width, height)
-        self.xlim = xlim
-        self.ylim = ylim
+        self.name        = name
+        self.width       = width
+        self.height      = height
+        self.scale       = scale
+        self.rect        = pg.Rect(pos[0], pos[1], width, height)
+        self.xlim        = xlim
+        self.ylim        = ylim
         self.frame_count = 0
 
-    def init_sprite(self, sprite_path, n_frames, frame_rate, width, height, scale):
+    def init_sprite(self, sprite_path, n_frames, frame_rate):
+        self.sprite_path = sprite_path
         self.spritesheet = SpriteSheet(sprite_path)
-        self.frame_rate = frame_rate
-        self.frames = [self.spritesheet.get_image(f, width, height, scale) for f in range(n_frames)]
+        self.n_frames    = n_frames
+        self.frame_rate  = frame_rate
+        self.frames      = [self.spritesheet.get_image(f, self.width, self.height, self.scale) for f in range(n_frames)]
+    
+    def get_data(self):
+        return {'name':        self.name,
+                'width':       self.width,
+                'height':      self.height,
+                'scale':       self.scale,
+                'pos':         [self.rect.x, self.rect.y],
+                'xlim':        self.xlim,
+                'ylim':        self.ylim,
+                'sprite_path': self.sprite_path,
+                'n_frames':    self.n_frames,
+                'frame_rate':  self.frame_rate}
 
     def update_input(self):
         keys = pg.key.get_pressed()
