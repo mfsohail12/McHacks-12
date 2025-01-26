@@ -28,11 +28,11 @@ const HomePage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (data) {
-    setPosition(data.queue_position.global);
-    setPhase(data.status.current_phase);
-    setTriage(data.triage_category);
-  }
+  // if (data) {
+  //   setPosition(data.queue_position.global);
+  //   setPhase(data.status.current_phase);
+  //   setTriage(data.triage_category);
+  // }
 
   console.log(data);
 
