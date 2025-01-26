@@ -27,12 +27,16 @@ def dataset():
 
 @app.route("/phases")
 def phases():
-    return render_template("phases.html", title="Home")
+    return render_template("phases.html", title="phases")
 
 
 @app.route("/triage")
 def triage():
-    return render_template("triage.html", title="Home")
+    return render_template("triage.html", title="triage")
+
+@app.route("/whoAreWe")
+def whoAreWe():
+    return render_template("whoAreWe.html", title="whoAreWe")
 
 
 @app.route("/login", methods=["GET", "POST"])
