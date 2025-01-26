@@ -4,11 +4,20 @@ import {
   createRoutesFromElements,
   RouterProvider,
 } from "react-router-dom";
-import HomePage from "./components/HomePage";
+import HomePage from "./pages/HomePage";
+import MainLayout from "./layouts/MainLayout";
+import GameHub from "./pages/GameHub";
 
 function App() {
   const router = createBrowserRouter(
-    createRoutesFromElements(<Route path="/home" element={<HomePage />} />)
+    createRoutesFromElements(
+      // <Route path="/" element={<MainLayout />}>
+      <>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/gamehub" element={<GameHub />} />
+      </>
+      // </Route>
+    )
   );
 
   return <RouterProvider router={router} />;
