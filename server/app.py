@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, redirect, url_for
 from patients import generate_mock_patient
 from flask_cors import CORS
 # from waitress import serve
@@ -20,9 +20,26 @@ def dataset():
 		'patients': [p.serialize() for p in patients]
 	})
 
-@app.route('/explain')
-def explain():
-	return render_template('explanation.html', title='Home')
+
+@app.route('/phases')
+def phases():
+	return render_template('phases.html', title='Home')
+
+
+@app.route('/triage')
+def triage():
+	return render_template('triage.html', title='Home')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        if request.form['username'] != 'admin' or request.form['password'] != 'admin':
+            error = 'Invalid Credentials. Please try again.'
+        else:
+            return redirect(url_for('phases'))
+    return render_template('login.html', error=error)
 
 
 if __name__ == '__main__':
